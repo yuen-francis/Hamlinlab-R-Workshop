@@ -1,11 +1,14 @@
 base
-tufte
-here
-ggplot2
-png
+methods
+datasets
+utils
+grDevices
+graphics
+stats
 apa
 knitr
 tidyverse
+ggplot2
 tibble
 tidyr
 readr
@@ -13,3 +16,7 @@ purrr
 dplyr
 stringr
 forcats
+tufte
+here
+png
+grid

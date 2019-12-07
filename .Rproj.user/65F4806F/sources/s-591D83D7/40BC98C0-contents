@@ -4,12 +4,12 @@ subtitle: "Why R is awesome and some basic stuff"
 author: "Francis Yuen"
 date: "`r Sys.Date()`"
 output:
-  tufte::tufte_html:
-    toc: yes
-    toc_depth: 2
   tufte::tufte_handout:
     citation_package: natbib
     latex_engine: xelatex
+  tufte::tufte_html:
+    toc: yes
+    toc_depth: 2
   tufte::tufte_book:
     citation_package: natbib
     latex_engine: xelatex
@@ -25,9 +25,9 @@ library(tufte)
 library(here)
 library(png)
 library(grid)
-# invalidate cache when the tufte version changes
-knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'))
-options(htmltools.dir.version = FALSE)
+opts_chunk$set(echo=TRUE, 
+               warning=FALSE, message=FALSE, 
+               cache=FALSE)
 ```
 
 
@@ -40,9 +40,10 @@ options(htmltools.dir.version = FALSE)
 
 R is essentially another option for computing statistics. It is (initially) less intuitive to use compared to SPSS and Excel, but it has several advantages that make it an awesome tool. Over the next few months, you will most likely consistently ask yourself: "Why am I struggling with this instead of just using SPSS or Excel?" That's totally normal, and you just have to remind yourself of the two major advantages of R:
 
-```{r fig-margin, fig.margin = TRUE, fig.cap = "Workflow in R, image from https://r4ds.had.co.nz/explore-intro.html", fig.width=3.5, fig.height=1, cache=TRUE, message=FALSE, echo = FALSE}
-Rworkflow <- readPNG("Images/R_workflow.png")
-grid.raster(Rworkflow)
+```{r fig-margin, fig.cap = "Workflow in R, image from https://r4ds.had.co.nz/explore-intro.html", cache=TRUE, message=FALSE, echo = FALSE}
+knitr::include_graphics("Images/R_workflow.png",
+                        dpi = 120)
+
 ```
 
 1. Flexibility: R has many more options as your computation gets more complicated
@@ -50,7 +51,7 @@ grid.raster(Rworkflow)
 
 R is essentially a one-stop-shop for all your research needs: from data cleaning to analysis to visualization, everything can be done in one place!
 
-***
+\vspace{12pt}
 
 # Installing R and RStudio
 
@@ -66,7 +67,7 @@ To get things started, you will need to download R as well as RStudio:
 
 Rstudio is a set of tools that makes R easier to use. For the purposes of this workshop, we will be only working in RStudio (but you still need to install both).
 
-***
+\vspace{12pt}
 
 # Basics of R
 
@@ -89,10 +90,6 @@ There are also different types of data. The most common ones that we will be wor
 
 Now that we have RStudio installed, let's take a look at the different parts of the interface. First, let's explore what R can do by looking at the console. The console is where you give 'commands' to R, ranging anywhere from simple math questions to several lines of code. 
 
-```{r Rconsole figure, fig.margin = FALSE, fig.cap = "Note: the positioning of my console as well as the color scheme displayed here is different from the default. You can arrange your panes by going to Tools -> Global Options -> Pane Layout, and you can change the theme by going to Tools -> Global options -> Appearance.", fig.width=9, fig.height=5, cache=TRUE, message=FALSE, echo = FALSE}
-Rworkflow <- readPNG("Images/R_console.png")
-grid.raster(Rworkflow)
-```
 
 To illustrate, let's ask R to solve a math questions that's literally impossible for an average human to compute:
 
@@ -128,10 +125,6 @@ Using R like a calculator is fun, but we can also store our answers as temporary
 answer <- 3 + 5
 ```
 
-```{r Renvironment figure, fig.margin = FALSE, fig.cap = "The environment will store anything you define with the <- operator. You can also use = to define objects, but it's not recommended as = has special meaning that are often used for other purposes.", fig.width=9, fig.height=5, cache=TRUE, message=FALSE, echo = FALSE}
-Rworkflow <- readPNG("Images/R_environment.png")
-grid.raster(Rworkflow)
-```
 
 Notice now it doesn't give you the answer as an output, but it stores the answer as an object called "answer" in your workspace (or your Environment). Now, type in answer in your console to recall it:
 
@@ -151,14 +144,10 @@ It is also useful to have these commands as actual lines that you can rerun inst
 
 Now, if you press Enter, all it will do is move on to the next line. In order to tell R that you want to execute this line, click anywhere on the line you want to run (or to run multiple lines, highlight the lines you want to run) and click the Run button on the top right of your script section, or hold the Ctrl key (command key for Mac users) and press Enter.
 
-```{r R script figure, fig.margin = FALSE, fig.cap = "R scripts allows you to store a series of commands for future use. Press the Run button to execute the line your cursor is currently on or lines that are highlighted. Ctrl + R on Windows or Cmd + R on Macs are the short cuts for running lines in an R script.", fig.width=9, fig.height=5, cache=TRUE, message=FALSE, echo = FALSE}
-Rworkflow <- readPNG("Images/R_run.png")
-grid.raster(Rworkflow)
-```
-
 **Exercise 2**
 
 Pretend you ran 5 babies in a looking time study, and their looking times on the test trial are 5, 7, 15, 21, and 25 seconds. Create a variable to store the sum of their looking time, a variable that represents the number of babies you ran. Finally, using those two variable, create a third variable that represents the mean looking time for your study.
+
 
 **Challenge:** Instead of doing this in three steps in your console, write three lines in your script that performs these actions and run them all at once!
 
