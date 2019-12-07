@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575738199953.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "40BC98C0",
+    "lastKnownWriteTime" : 1575740519,
+    "last_content_update" : 1575740519540,
+    "path" : "Z:/Concerning RA's/RAs/Francis/R Workshop/Introduction/Introduction.Rmd",
+    "project_path" : "Introduction/Introduction.Rmd",
+    "properties" : {
+        "cursorPosition" : "9,23",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
