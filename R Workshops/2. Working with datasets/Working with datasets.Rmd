@@ -1,0 +1,350 @@
+---
+title: "Working with datasets"
+subtitle: ""
+author: "Francis L. Yuen"
+date: "`r Sys.Date()`"
+output:
+  tufte::tufte_handout:
+    citation_package: natbib
+    latex_engine: xelatex
+  tufte::tufte_html: default
+  tufte::tufte_book:
+    citation_package: natbib
+    latex_engine: xelatex
+bibliography: skeleton.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+library(apa)
+library(knitr)
+library(tufte)
+library(here)
+opts_chunk$set(echo=TRUE, 
+               warning=FALSE, message=FALSE, 
+               cache=FALSE)
+```
+
+Learning goals:
+
+1. Analyzing and plotting data
+2. Reading data in a reproducible fashion
+3. Tidy data and tidyverse
+
+
+# Analyzing and plotting data
+
+Working with datasets is the main goal of using R (at least for us). To practice working with a dataset, we're going to use a sample dataset built into R. The dataset is called 'mtcars'.
+
+- Open a new R script
+- Create a new object in your environment called 'data' by assigning 'mtcars' to it (remember the <- operator?)
+- Inspect 'data'
+- load the "tidyverse" package for use later
+
+```{r mtcars}
+data <- mtcars
+library(tidyverse)
+```
+
+An **observation** (or obs.) is how many *rows* are in your dataset, and a **variable** is how many *columns*. R is especially good at working with **tidydata**, but we will get into what that means in a bit. Let's first play around with this dataset by using some useful functions. Before we do that, we need to figure out what the variable names mean since we're not the ones that named it. Fortunately, 'mtcars' is well documented, so we can type in `?mtcars` to inspect it. The first thing you should do when you load in a new dataset is to examine its `structure` using the `str()` function:
+
+```{r}
+str(data)
+```
+
+This will tell you how each variable is defined. If you are familiar with your dataset, you should use this chance to double check that the category is correct for each variable (e.g. if a variable is a group, it should be a `factor` and not `numeric`; more on this later).
+
+Next, let's get a sense of what we're working with:
+```{r summary}
+summary(data)
+```
+
+`summary()` gives you some very basic descriptives. These can sometimes be useful to check for outliers, but doesn't tell us anything particularly interesting. Let's say we want to see if the number of forward gears (gear) is related to horsepower (hp). Since the number of forward gears is our independent variable, We will ask R to organize the dataset by gear:
+
+```{r}
+data <- group_by(.data = data, gear)
+```
+
+`group_by` takes quite a few arguments (check `?group_by` if you're interested!), the most important ones being the .data argument where you specify which dataset you want it to work with, and *one or more* variable arguments it should group by.
+
+Look at 'data' again. Doesn't seem like anything happened, right? All `group_by()` does is add an invisible 'marker' to all the observations depending on their value in the 'gear' column. Now, let's check the dataset again, this time using `summarize()`. We will store our results as a new object 'mean_hp':
+
+```{r}
+mean_hp <- summarize(.data = data, mean = mean(hp))
+mean_hp
+```
+
+`summarize()` is a cool function that takes one dataset, and performs any number of additional functions to that dataset. What's really useful about `summarize()` is when you use it in tandem with `group_by` because any function you apply with `summarize()` will operate using the group markers. Let's see what else we can do:
+
+```{r}
+mean_hp <- summarize(data,
+                     mean = mean(hp),
+                     sd = sd(hp),
+                     n = length(hp),
+                     SEM = sd/sqrt(n))
+mean_hp
+```
+
+Notice how we can nest several functions that are dependent on each other (i.e. in order to calculate the standard error of the mean, we needed to first calculate the standard deviation and count the number of observations in each group). These need to be in the correct order as summarize always evaluates from top to bottom.
+
+Now that we have all this info, it's time to make some pretty graphs. The most common graphing tool in R is `ggplot()`. We will first start with a basic point plot using the original data set:
+
+```{r fig.margin = TRUE}
+ggplot(data,
+       aes(x = gear, y = hp)) + 
+  geom_point()
+```
+
+Interesting, looks like R doesn't know that the gear variable is not a continuous variable, so it plotted the x-axis as if gear can be a non-integer. To fix this, we will modify the definition of the gear column and turn it into a `factor` column instead of `numeric`. Then, we will check that we succeeded by using `str()`:
+
+```{r}
+data$gear <- as.factor(data$gear)
+str(data)
+```
+
+Now that the gear variable is a factor, let's plot it again, this time with some color:
+
+```{r fig.margin = TRUE}
+ggplot(data,
+       aes(x = gear, y = hp, color = gear)) + 
+  geom_point()
+```
+
+The best thing about `ggplot()` is that you can customize it by adding more 'layers' on top of each other. Let's add the means for each gear group as well as their corresponding standard errors we calculated earlier as error bars (we need to specify gear as a factor for `mean_hp` first):
+
+```{r fig.margin = TRUE}
+mean_hp$gear <- as.factor(mean_hp$gear)
+
+ggplot(data = data,
+       aes(x = gear, y = hp, color = gear)) + 
+  geom_point(position = position_jitter(width = 0.1)) + 
+  geom_errorbar(data = mean_hp,
+                  aes(x = gear,
+                      y = mean,
+                      color = NULL,
+                      ymin = mean - SEM,
+                      ymax = mean + SEM),
+                width = 0.05) + 
+  geom_point(data = mean_hp,
+             aes(x = gear,
+                 y = mean,
+                 color = NULL,
+                 shape = gear),
+             size = 2)
+```
+Much better!
+
+\vspace{6pt}
+
+**Exercise 1**
+
+Look at 'data' again. Come up with a new hypothesis and make a new plot illustrating the relationship between the variables you chose.
+
+```{marginfigure}
+Note: The easiest ones would be to have a categorical independent variable and a continuous dependent variable. If you want a challenge and to do something fancier, feel free to choose continuous variables for both!
+```
+
+\vspace{12pt}
+
+# Reproducible workflow
+
+## Creating an Rproject
+
+Now that we know what to do with data, we need to know how to load in our own datasets that are not a part of R. This means we need to start thinking about how to make our entire workflow reproducible, i.e. how to make it so that someone else can download our entire project and be able to run everything smoothly. To do that, we will create an **RProject**. Go to File -> New Project, and choose New Directory then New Project. Click 'Browse' to go to where you want to save your project, then for directory name, put "Workshop_2" without the quotation marks. This will create a folder where you can store all files related to your study.
+
+
+It's generally a good idea to have subfolders for different types of content. For example, you might want a folder just for data, and a folder just for Rscripts. 
+```{marginfigure}
+There is no rule for how to set up your project, you can tailor it to your personal preference as long as it's organized.
+```
+To start, navigate to "Workshop_2" and create two new folders: "data" and "scripts". Save the Rscript you have been working on in the "scripts" folder and give it a name (suggestion: mtcars_practice).
+
+Next, we will start a cleaning script. Raw datasets are often really messy and difficult to work with; luckily, R has a lot of neat tools that can help us manipulate the data. Another option would be to manually edit the data in Excel, which can sometimes be easier if the dataset is not huge. Most of the time it will be easier and faster with the help of the 'janitor' package.
+```{marginfigure}
+Hint: install the package using the function `install.packages("janitor")`
+```
+
+Create a new R script and save it in the "scripts" folder. Call this "cleaning_script". Start the script by writing a few lines that loads in three packages: "tidyverse", "here", and "janitor":
+
+```{r, echo = FALSE}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+## Reading raw data into R
+
+Next, download **[sample_data_1](https://drive.google.com/file/d/1WslHg8e5bYYAc2vY4MWrHO2CTu92eAcy/view?usp=sharing)** and save it in, or move it to, the "data" folder. 
+```{marginfigure}
+This is a pseudo-randomly generated dataset and is not from a real study, but for the purposes of practicing cleaning it will be fine.
+```
+
+Now, we are going to use the `read_csv()` function from the 'tidyverse' package to load in the data:
+
+```{r, eval=FALSE}
+data <- read_csv("sample_data_1.csv")
+```
+
+Oops! If you try to run this on its own, R knows to look for a file called sample_data_1.csv, but it doesn't know where to start! Traditionally, the way to help R find the data is to set your working directory to the correct folder. However, people have different places where they store things on their computer, so this is *not* a reproducible method. This is where the 'here' package kicks in:
+```{marginfigure}
+Note: Even if people download your entire project, they would still have to set the working directory manually. The goal is to prevent any additional step that a researcher would have to take to reproduce your results.
+```
+```{r eval=FALSE}
+data <- read_csv(here("data", "sample_data_1.csv"))
+```
+```{r include = FALSE}
+data <- read_csv(here("R Workshops/2. Working with datasets/data", "sample_data_1.csv"))
+```
+
+`here()` tags an additional argument that tells R which folder to look in. It always starts in the directory where the code is located (in our case, the "scripts" folder), which means that when someone else downloads your Rproject, it doesn't matter where they store the actual project because `here()` will never leave the parent directory.
+
+\vspace{6pt}
+
+**Exercise 2**
+
+Suppose you want to create a subfolder in your "data" folder so you can differentiate between raw data and cleaned data. Make a folder in "data" called "raw_data", and move sample_data_1.csv in there. Now modify your read_csv line of code to help R find your file.
+
+## Cleaning the data
+
+Inspect your data. It doesn't look too bad, but the column names are inconsistent: some have capital letters, some are separated by hyphens and some by spaces. It will save us a lot of time down the road if we clean these up right now:
+
+```{r}
+data <- clean_names(data)
+```
+
+Inspect the data again. What changed? Think of at least two reasons why this is easier to work with than the previous one.
+
+\vspace{12pt}
+
+# Tidy data and tidyverse
+
+## What is tidy data?
+
+In the first section, it was really easy for us to use `group_by()`, `summarize()`, and `ggplot()`. Unfortunately, not all raw datasets will be 'ready' for use like 'mtcars'. In fact, most datasets will NOT be nicely organized that way. For R to have maximal efficiency, datasets need to be manipulated into a special format called **tidy data**. Tidy data has three main requirements:
+
+1. Each column represents *one* **variable**
+2. Each row represents *one* **observation**
+3. Each cell contains only *one* **value**
+
+\vspace{6pt}
+
+**Exercise 3**
+
+Take a look at our sample data. Is it tidy? Why or why not? 
+
+## Tidying your dataset
+
+Now we are going to try and turn our sample data into the tidy format. The most useful function for this step is usually `pivot_longer()` from the 'tidyverse' package, which takes data in the 'wide' format (a lot of columns, usually NOT tidy) and turn it into the 'long' format (a lot of rows, which is characteristic of tidy data). Since each row should be an observation, each row should have the looking time of only **one trial** instead of 10. Also, 'trial1' is *not* a variable. What we need to do is to take the values from trial1 to trial 10, and generate 10 rows of data for each baby with the trial number as the actual variable (which can range from 1 to 10 since there are 10 total trials). We're going to store this as a new object 'data_long' so that we can compare the two afterwards:
+
+```{r}
+data_long <- pivot_longer(data = data,
+                     cols = c(trial1:trial10),
+                     names_to = "trial_number",
+                     names_prefix = "trial",
+                     values_to = "looking_time")
+```
+
+```{marginfigure}
+pivot_longer takes quite a few arguments. Use ?pivot_longer() to see the full description and see if you can decipher what each argument is doing
+```
+
+Take a look at data_long. It is now tidy and ready to be analyzed.
+
+## Data analysis and tidyverse
+
+\vspace{6pt}
+
+**Exercise 4**
+
+Using the tools you learned earlier, check if there is a difference between the mean looking time of babies who saw the yellow character as the mean guy versus those who saw the blue as the mean guy.
+
+```{r include = FALSE}
+data_long <- group_by(.data = data_long, mean_character)
+mean_data_long <- summarize(.data = data_long,
+                            mean = mean(looking_time))
+```
+
+Turns out for this study, we only want to compare the looking time of the first 4 trials. We can use the `filter()` function to set a criteria and pick out only the **rows** in which we are interested:
+
+```{r}
+data_1to4 <- filter(.data = data_long, 
+                    trial_number < 5)
+```
+
+We can also do the same with **columns** if there are too many columns that we don't care about. For example, the 'age' column is redundant, so we can get rid of it with the `select()` function:
+
+```{r}
+data_no_age <- select(.data = data_long, -age)
+```
+```{marginfigure}
+Here, the advantage of having column names with no spaces really shows: you can simply type in the column name age_month instead of having to wrap it with `` and type `age months`
+```
+
+You can also specify multiple columns at the same time using the following format:
+
+```{r}
+data_no_age <- select(.data = data_long, -c(age, age_month, age_day))
+```
+
+We can also easily add new columns by using the `mutate()` function. Let's say we noticed that our coding software sytematically subtracted 2 seconds from everyone's looking time. To correct for that, let's add a new column with the corrected looking time:
+
+```{r}
+data_correct <- mutate(.data = data_long,
+                       corrected_looking_time = looking_time + 2)
+```
+
+Now you have most of the tools you need to do simple data wrangling and analysis!
+
+\vspace{6pt}
+
+**Exercise 5**
+
+
+On your Rscript, write a series of code that does the following in sequence:
+
+1. Read in sample_data_1.csv 
+```{marginfigure}
+Steps 1 - 3 should already be completed
+```
+2. Clean the column names 
+3. Convert to tidy format
+4. Create a new column that adds 3.4 seconds to everyone's looking time
+5. Filter out trials where corrected looking time exceeds 30 seconds
+6. Create a column that log transforms everyone's looking time
+```{marginfigure}
+Hint: log(x) is the math forumla for log transformation where x is the number to be transformed
+```
+7. Compare the log transformed looking time of babies who chose with vs against by calculating the mean, sd, number of observations, and SEM. Store the results as 'lt_by_choice'
+```{marginfigure}
+Hint: SEM = sd/sqrt(n)
+```
+
+
+```{r include = FALSE}
+data_tidy <- pivot_longer(data = data,
+                     cols = c(trial1:trial10),
+                     names_to = "trial_number",
+                     names_prefix = "trial",
+                     values_to = "looking_time")
+data_tidy <- mutate(.data = data_tidy,
+                    corrected_looking_time = looking_time + 3.4,
+                    log_looking_time = log(corrected_looking_time))
+data_tidy <- filter(.data = data_tidy,
+                    corrected_looking_time <= 30.00)
+data_tidy <- group_by(.data = data_tidy,
+                      hypothesis)
+lt_by_choice <- summarize(.data = data_tidy,
+                          mean = mean(log_looking_time),
+                          sd = sd(log_looking_time),
+                          n = length(log_looking_time),
+                          SEM = sd/sqrt(n))
+```
+
+
+
+
+
+
+
+
+

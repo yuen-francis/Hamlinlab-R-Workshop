@@ -4,12 +4,12 @@ subtitle: "Why R is awesome and some basic stuff"
 author: "Francis Yuen"
 date: "`r Sys.Date()`"
 output:
-  tufte::tufte_handout:
-    citation_package: natbib
-    latex_engine: xelatex
   tufte::tufte_html:
     toc: yes
     toc_depth: 2
+  tufte::tufte_handout:
+    citation_package: natbib
+    latex_engine: xelatex
   tufte::tufte_book:
     citation_package: natbib
     latex_engine: xelatex
@@ -23,13 +23,12 @@ library(knitr)
 library(tidyverse)
 library(tufte)
 library(here)
-library(png)
-library(grid)
 opts_chunk$set(echo=TRUE, 
                warning=FALSE, message=FALSE, 
                cache=FALSE)
 ```
 
+Learning Goals:
 
 1. Introduction to R and why it's awesome
 2. Install R and RStudio
@@ -111,6 +110,8 @@ kable(operations, align = 'c')
 
 One thing to note here is that R doesn't care about spacing: 1+1 and 1   +   1 is treated the same way, so you can organize your eventual code according to how you like it visually.
 
+\vspace{6pt}
+
 **Exercise 1** 
 
 Help each other solve some *actually* difficult math problems.
@@ -143,6 +144,8 @@ Note that none of these variable names have spaces, and this is because R uses w
 It is also useful to have these commands as actual lines that you can rerun instead of a one-time thing, so let's open up an R script. Go to File -> New File -> R script. In your new script, type in the exact same thing as before: answer <- 3 + 5.
 
 Now, if you press Enter, all it will do is move on to the next line. In order to tell R that you want to execute this line, click anywhere on the line you want to run (or to run multiple lines, highlight the lines you want to run) and click the Run button on the top right of your script section, or hold the Ctrl key (command key for Mac users) and press Enter.
+
+\vspace{6pt}
 
 **Exercise 2**
 
