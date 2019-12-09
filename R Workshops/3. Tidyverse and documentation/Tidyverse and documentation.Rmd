@@ -1,0 +1,84 @@
+---
+title: "Tidyverse and documentation"
+subtitle: ""
+author: "Francis L. Yuen"
+date: "`r Sys.Date()`"
+output:
+  tufte::tufte_html: default
+  tufte::tufte_handout:
+    citation_package: natbib
+    latex_engine: xelatex
+  tufte::tufte_book:
+    citation_package: natbib
+    latex_engine: xelatex
+bibliography: skeleton.bib
+link-citations: yes
+---
+
+```{r setup, include=FALSE}
+library(apa)
+library(knitr)
+library(tufte)
+library(tidyverse)
+library(here)
+library(janitor)
+opts_chunk$set(echo=TRUE, 
+               warning=FALSE, message=FALSE, 
+               cache=FALSE)
+```
+
+Learning goals:
+
+1. Writing readable scripts using the pipe function
+2. Properly document your script
+3. Practice cleaning, tidying, analyzing, and visualizing data
+
+# Writing readable scripts
+
+In the last workshop, we wrote a series of codes that analyzed a mock dataset. Open up that R script. It should look something like this:
+```{r include = FALSE}
+data <- read_csv(here("R Workshops/3. Tidyverse and documentation/data", "sample_data_1.csv"))
+data <- clean_names(data)
+```
+```{marginfigure}
+Remember to check that your raw data is stored in the right place so that `here()` can find it. Adjust the directory to help `here()` locate your raw data if necessary.
+```
+
+
+```{r eval=FALSE}
+library(tidyverse)
+library(here)
+data <- read_csv(here("data", "sample_data_1.csv"))
+data <- clean_names(data)
+data_tidy <- pivot_longer(data = data,
+                     cols = c(trial1:trial10),
+                     names_to = "trial_number",
+                     names_prefix = "trial",
+                     values_to = "looking_time")
+data_tidy <- mutate(.data = data_tidy,
+                    corrected_looking_time = looking_time + 3.4,
+                    log_looking_time = log(corrected_looking_time))
+data_tidy <- filter(.data = data_tidy,
+                    corrected_looking_time <= 30.00)
+data_tidy <- group_by(.data = data_tidy,
+                      hypothesis)
+lt_by_choice <- summarize(.data = data_tidy,
+                          mean = mean(log_looking_time),
+                          sd = sd(log_looking_time),
+                          n = length(log_looking_time),
+                          SEM = sd/sqrt(n))
+```
+
+
+Recall that one of the problems here is that you have to execute several separate lines, each one updating what 'data_tidy' is before finally arriving at your results. We can shorten the code by using a function called the pipe, which is written like this: `%>%`
+
+What the pipe does is **take the object that comes before the pipe, and pass it on as the first argument of the function that comes after the pipe**. To illustrate, let's use the pipe to rewrite the first part of our code and store it as `data_tidy2` so we can compare the results:
+
+```{r eval = FALSE}
+data_tidy2 <- data %>%
+  pivot_longer(cols = c(trial1:trial10),
+               names_to = "trial_number",
+               names_prefix = "trial",
+               values_to = "looking_time")
+```
+
