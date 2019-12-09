@@ -4,10 +4,10 @@ subtitle: ""
 author: "Francis L. Yuen"
 date: "`r Sys.Date()`"
 output:
+  tufte::tufte_html: default
   tufte::tufte_handout:
     citation_package: natbib
     latex_engine: xelatex
-  tufte::tufte_html: default
   tufte::tufte_book:
     citation_package: natbib
     latex_engine: xelatex
@@ -29,7 +29,7 @@ Learning goals:
 
 1. Analyzing and plotting data
 2. Reading data in a reproducible fashion
-3. Tidy data and tidyverse
+3. Tidy data and an introduction to tidyverse
 
 
 # Analyzing and plotting data
@@ -250,7 +250,7 @@ pivot_longer takes quite a few arguments. Use ?pivot_longer() to see the full de
 
 Take a look at data_long. It is now tidy and ready to be analyzed.
 
-## Data analysis and tidyverse
+## Data analysis and an intro to tidyverse
 
 \vspace{6pt}
 
@@ -258,7 +258,7 @@ Take a look at data_long. It is now tidy and ready to be analyzed.
 
 Using the tools you learned earlier, check if there is a difference between the mean looking time of babies who saw the yellow character as the mean guy versus those who saw the blue as the mean guy.
 
-```{r include = FALSE}
+```{r answers to exercise 4, include = FALSE}
 data_long <- group_by(.data = data_long, mean_character)
 mean_data_long <- summarize(.data = data_long,
                             mean = mean(looking_time))
@@ -319,8 +319,7 @@ Hint: log(x) is the math forumla for log transformation where x is the number to
 Hint: SEM = sd/sqrt(n)
 ```
 
-
-```{r include = FALSE}
+```{r answers to exercise 5, include = FALSE}
 data_tidy <- pivot_longer(data = data,
                      cols = c(trial1:trial10),
                      names_to = "trial_number",
@@ -340,11 +339,8 @@ lt_by_choice <- summarize(.data = data_tidy,
                           SEM = sd/sqrt(n))
 ```
 
+\vspace{12pt}
 
+Take a look at your answer for Exercise 5. How many lines did you have to execute? Is it 'readable'? If you left this script for a couple of weeks and come back later, will you remember what each line does? 
 
-
-
-
-
-
-
+It's often really complicated (and let's be real, quite annoying) to have several different steps until you reach the desired outcome. The more complicated the code is, the less likely you will understand what 'past you' was doing, and even less likely a stranger will know your thought process. In the next workshop, we will discuss documentation as well as introducing the 'pipe' function, which is a neat tool that allows you to streamline your codes.

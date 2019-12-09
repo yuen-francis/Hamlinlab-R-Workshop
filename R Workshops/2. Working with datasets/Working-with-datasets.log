@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2019.11.16)  7 DEC 2019 17:03
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019/W32TeX) (preloaded format=xelatex 2019.11.16)  9 DEC 2019 11:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1167,25 +1167,25 @@ This message occurred on input line 696.
 
 [8]
 No file Working-with-datasets.bbl.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 716.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 730.
 
 Class tufte-handout Warning: Proper spacing of small-caps letters has not been 
 set up.
-This message occurred on input line 716.
+This message occurred on input line 730.
 
 [9]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 716.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 730.
 (./Working-with-datasets.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 716.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 716.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 730.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 730.
 Package rerunfilecheck Info: File `Working-with-datasets.out' has not changed.
 (rerunfilecheck)             Checksum: 6FC95A58714663BDFFF40C827BE59A12.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 716.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 730.
  ) 
 Here is how much of TeX's memory you used:
  25146 strings out of 494465
- 469823 string characters out of 6171801
- 592969 words of memory out of 5000000
+ 469835 string characters out of 6171801
+ 593981 words of memory out of 5000000
  29205 multiletter control sequences out of 15000+600000
  534623 words of font info for 49 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
