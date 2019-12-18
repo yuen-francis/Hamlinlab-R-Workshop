@@ -4,14 +4,14 @@ subtitle: ""
 author: "Francis L. Yuen"
 date: "`r Sys.Date()`"
 output:
+  tufte::tufte_html: default
   tufte::tufte_handout:
     citation_package: natbib
     latex_engine: xelatex
-  tufte::tufte_html: default
   tufte::tufte_book:
     citation_package: natbib
     latex_engine: xelatex
-bibliography: skeleton.bib
+bibliography: References.bib
 link-citations: yes
 ---
 
@@ -22,6 +22,7 @@ library(tufte)
 library(tidyverse)
 library(here)
 library(janitor)
+library(papaja)
 opts_chunk$set(echo=TRUE, 
                warning=FALSE, message=FALSE, 
                cache=FALSE)
@@ -152,7 +153,7 @@ That symbol is NOT an apostrophe; the button is usually under the Esc key. You c
 
 \```
 
-The space between the \```{r} and the closing \``` is where you write your R script, and RMarkdown treats it as such. For example, let's plot something simple from `mtcars`:
+The space between is where you write your R script, and RMarkdown treats it as such. For example, let's plot something simple from `mtcars`:
 
 \```{r}
 
@@ -187,6 +188,187 @@ ggplot(mtcars, aes(x = cyl, y = mpg)) +
 geom_point()
 ```
 
+It's annoying to have to set chunk options everytime. It's very useful for manuscripts to have a default determined right from the start. A useful function for that is:
+
+```{r eval=FALSE, include=TRUE}
+
+knitr::opts_chunk$set(fig.width=8, fig.height=5,
+               echo=FALSE, 
+               warning=FALSE, message=FALSE, 
+               cache=FALSE)
+
+```
+               
+               
+This sets a default code chunk setting for all of your code chunks in the document, and you can override it in each individual chunk. Add this to your `setup` chunk at the start of the document.
+
 # Generating APA-formatted papers
 
 We're in the end-game now. Learning all of these things is ultimately so we can knit a fully reproducible manuscript that is APA-formatted. If you have `papaja` installed, you're already half way there. Start up a new markdown file again, but this time choose `From Template`, there should be an option for APA 6th edition.
+
+You probably noticed that we now have **a lot** more stuff in our header. Don't worry about these for now, they are there for customization. We will only cover three core aspects of writing a manuscript in RMarkdown: Bibliography, imbedding graphs, and recalling statistics.
+
+## Bibliography
+
+This might be already familiar if you already use a reference manager. If you're still manually typing in all your references (no shame, I did that just over a year ago), this will be life changing. First, you need to install your favorite reference manager. [Bibdesk](http://bibdesk.sourceforge.net/) is very popular among Mac users, I personally use [Jabref](https://www.jabref.org/) because I have a PC. Choose whatever you want as long as you save the resulting .bib file within your Rproject. 
+
+Using your reference manager, create a new .bib file and add a few citations in there. If you would prefer to figure out how to use a reference manager later, you can skip this step for now and use my library for now, which can be downloaded [here](https://drive.google.com/file/d/1I2tEKoy3OL2anSwGpF0pTiR1AdRwo48K/view?usp=sharing). Make sure to save your library in the same folder as your markdown file.
+
+Go back to your APA styled markdown file. In the header section, change the bibiography to whatever you named your .bib file (if you used the sample one, it will be `References.bib`). Now, delete the sample abstract and write a sentence like this:
+
+\vspace{6pt}
+
+\@Hamlin2007's study is very cool, but some other studies are just as cool [\@Hamlin2011].
+
+\vspace{6pt}
+
+```{marginfigure}
+Note: Every reference manager assigns different `code names` to each paper. I am unsure how each of them format it, but usually it's LastnameYEAR.
+```
+
+
+Knit the document and see what happens. Not only does it do the in-text citation correctly for you, it also adds it to your reference list at the end. Now you no longer have to carefully check that everything you cite in the paper is in your bibliography! 
+
+## Imbedding figures
+
+As we practiced earlier, using a code chunk with `echo` set to `FALSE` will allow you to output a graph. What does that look like using the APA template?
+
+\vspace{6pt}
+
+**Exercise 2**
+
+```{marginfigure}
+If you choose to use a previous dataset, make sure to follow best practices of workflow and save the dataset in the correct place to read in!
+```
+```{marginfigure}
+Also don't forget to add library(tidyverse) to the setup chunk near the beginning of the document!
+```
+
+
+
+Create a graph of your choice from either one of the sample datasets (`mtcars` or `iris`), or from a sample dataset we used in earlier workshops. Put the code chunk in the **results** section, and write a few sentences explaining the results. 
+
+\vspace{6pt}
+
+**Sample answer**
+
+\vspace{6pt}
+
+
+```{r eval=FALSE, include=TRUE}
+
+data <- mtcars
+data <- data %>%
+  group_by(gear) %>%
+  summarize(mean_hp = mean(hp))
+data$gear <- as.factor(data$gear)
+ggplot(data, aes(x=gear, y=mean_hp)) +
+  geom_col(position=position_dodge(0.9)) + 
+  theme_apa()
+
+```
+
+
+\vspace{6pt}
+
+Adding captions is an important part of making good graphs, and you can make captions easily by modifying the code chunk with a `fig.cap=` option like this:
+
+
+\```{r fig1, fig.cap = "\\label{fig:fig1}This is my practice plot for Exercise 2."}
+
+```{marginfigure}
+The fig1 right after the r is the 'name' of the chunk. These must be unique and helps you keep track of what each chunk does. the fig:fig1 part of fig.cap identifies which chunk it should reference when it makes the caption.
+```
+
+\vspace{6pt}
+
+**Exercise 2.5**
+
+Add a caption to your graph from Exercise 2.
+
+\vspace{6pt}
+
+We can do the same thing with tables. The `kable()` function is a nice start, although if we want an APA formatted table, we should use `apa_table()`. Let's reuse the data you made earlier for Exercise 2, except turn it into a table this time:
+
+```{marginfigure}
+`apa_table()` is weird and you have to have the results = 'asis' as a code chunk option in order for it to work. Not a good idea to set this as a default because it messes up many other common functions, so it's better to manually put it in every time you have a code chunk that uses `apa_table()`
+```
+
+
+\```{r results = 'asis'}
+
+apa_table(data)
+
+\```
+
+## Referencing statistics
+
+```{marginfigure}
+Note: These are not necessarily the most appropriate tests, and are only chosen for their simplicity to demonstrate functions in RMarkdown.
+```
+
+
+One of the most common mistakes in manuscripts is writing the strong number/statistic. It sounds silly, but it's something that can slip under the radar easily especially if no one else knows what exact details of your analyses (or if your raw data changes and you accidentally forget to change one number in your manuscript). Thankfully, we can avoid these problems with RMarkdown. Let's illustrate this with some simple tests. 
+
+
+We will examine the `iris` dataset and hypothesize that different species have different sepal width. Let's first do some descriptives:
+
+```{r eval=FALSE, include=TRUE}
+d <- iris
+d_summary <- d %>%
+  group_by(Species) %>%
+  summarize(mean_sepal_width = mean(Sepal.Width))
+```
+
+Looks like there is a difference between the means. A simple 1x3 ANOVA will help us figure out if there is an effect:
+
+```{r}
+d <- iris
+d_summary <- d %>%
+  group_by(Species) %>%
+  summarize(mean_sepal_width = mean(Sepal.Width))
+anova <- summary(aov(Sepal.Width ~ Species, data = d))
+```
+
+Call `anova` in your console. Looks good! How do we format this so we can reference specific numbers? The `apa_print()` function is handy here. It will take statistical results and reformatted to be easily incorporated into the manuscript:
+
+```{marginfigure}
+Note: Not ALL analyses are supported right now. Google the documentation for `apa_print()` to see a full list of supported analyses.
+```
+
+
+```{r}
+anova_apa <- apa_print(anova)
+```
+
+Now we can use **inline code chunks** to call specific parts of the anova. To add an inline code chunk, you start with \` r and close it with a \`, similar to code chunks except you only use one \`. 
+
+Click on `anova_apa` or use `View(anova_apa)`. You will notice several options for you to reference. The ones that are most commonly referenced are the `statistics` and `full_result`. Let's say I want to report all of the results, this is what it would look like:
+
+> A 1x3 ANOVA with sepal width as the dependent variable and iris species as the independent variable revealed a significant main effect of species (\` r anova_apa$full_result\`)
+
+What does that look like when you knit it?
+
+```{marginfigure}
+Don't worry about text size here. The format that this document uses is not APA. When you use the APA template everything will look fine.
+```
+
+
+> A 1x3 ANOVA with sepal width as the dependent variable and iris species as the independent variable revealed a significant main effect of species (`r anova_apa$full_result`)
+
+We can also spit out a nice ANOVA table using what we learned earlier:
+
+```{marginfigure}
+The labeling is messed up here because this is not an APA formatted paper.
+```
+
+
+```{r Sample ANOVA table, eval=FALSE,results='asis'}
+apa_table(anova_apa$table,
+          caption = "ANOVA table for demonstration purposes",
+          note = "What a nice looking table")
+```
+
+
+
+

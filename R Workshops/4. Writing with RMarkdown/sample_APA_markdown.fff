@@ -1,0 +1,7 @@
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{sample_APA_markdown_files/figure-latex/fig1-1.pdf}
+\caption{\label{fig:fig1}\label{fig:fig1}Horsepower by number of gears.}
+\end{figure*}

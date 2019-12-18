@@ -1,0 +1,18 @@
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+[tbp]
+\begin{center}
+\begin{threeparttable}
+\caption{\label{tab:fig2}}
+\begin{tabular}{ll}
+\toprule
+gear & \multicolumn{1}{c}{mean\_hp}\\
+\midrule
+3 & 176.13\\
+4 & 89.50\\
+5 & 195.60\\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{center}
+\end{table*}
